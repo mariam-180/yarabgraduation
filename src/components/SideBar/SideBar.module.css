@@ -1,0 +1,36 @@
+.siderBar {
+    width: 200px;
+    height: 115vh;
+    background-color: #1f2937; /* gradient background */
+    padding-top: 20px;
+    box-shadow: 9px 0 20px rgba(0,0,0,0.3);
+   
+}
+
+.sidebar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #f3f4f6;
+}
+
+.sidebar-menu li {
+    padding: 15px 20px;
+    border-bottom: 1px solid #374151;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 5px 0 0 5px;
+}
+
+.sidebar-menu li:hover {
+    background-color: #374151;
+    padding-left: 25px; /* small slide effect */
+    color: #fbbf24; /* highlight color on hover */
+}
+
+.sidebar-menu li.active {
+    background-color: #4b5563;
+    color: #fbbf24;
+    font-weight: bold;
+}

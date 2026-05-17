@@ -1,0 +1,83 @@
+.registerPage {
+  height: 100vh;
+  background: linear-gradient(135deg, #0D1B2A, #1F4068, #3B82F6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.registerCard {
+  background: #ffffffee;
+  padding: 25px 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 1100px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+}
+
+.registerTitle {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0F4C81;
+}
+
+/* ✅ 3 column grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.registerGroup label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+  color: #0F4C81;
+}
+
+.registerGroup input,
+.registerGroup select,
+.registerGroup textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d5ddea;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.fullWidth {
+  grid-column: span 3;
+}
+
+textarea {
+  min-height: 60px;
+  resize: none;
+}
+
+.registerBtn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 15px;
+  background: linear-gradient(90deg, #14B8A6, #6B5BFF);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.errorText {
+  color: red;
+  font-size: 12px;
+}
+
+.successText {
+  color: green;
+  font-size: 12px;
+}

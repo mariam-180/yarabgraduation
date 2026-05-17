@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif; /* Clean, modern font */
+  background-color: #F8FAFC;
+  color: #1E293B;
+}
+
+/* Make every button look professional */
+button {
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}

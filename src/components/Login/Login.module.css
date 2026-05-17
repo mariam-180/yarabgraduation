@@ -1,0 +1,201 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', Arial, sans-serif;
+  background: #0f172a;
+}
+
+/* ───────────────────────── */
+/* Animated Professional Background */
+/* ───────────────────────── */
+
+.loginPage {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0D1B2A, #1F4068, #3B82F6); /* dark blue to bright tech blue */
+
+  animation: bgMove 10s infinite alternate ease-in-out;
+  padding: 20px;
+}
+
+@keyframes bgMove {
+  from { background-position: 0% 0%, 100% 100%; }
+  to { background-position: 10% 20%, 90% 80%; }
+}
+
+/* ───────────────────────── */
+/* Glass Card */
+/* ───────────────────────── */
+
+.loginCard {
+  width: 100%;
+  max-width: 440px;
+  padding: 45px 40px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(59, 130, 246, 0.25);
+
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.loginCard:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(59, 130, 246, 0.4);
+}
+
+/* ───────────────────────── */
+/* Title */
+/* ───────────────────────── */
+
+.loginTitle {
+  text-align: center;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  letter-spacing: 0.5px;
+}
+
+/* ───────────────────────── */
+/* Inputs */
+/* ───────────────────────── */
+
+.loginInputGroup {
+  margin-bottom: 18px;
+}
+
+.loginInputGroup label {
+  display: block;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.loginInputGroup input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.loginInputGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.loginInputGroup input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ───────────────────────── */
+/* Button */
+/* ───────────────────────── */
+
+.loginBtn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+  color: white;
+
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+
+  transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+  filter: brightness(1.1);
+}
+
+.loginBtn:active {
+  transform: scale(0.97);
+}
+
+/* ───────────────────────── */
+/* Auth Links */
+/* ───────────────────────── */
+
+.authLinks {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.authLink {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #93c5fd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.authLink:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px #3b82f6;
+}
+
+.authLinkDivider {
+  color: rgba(255,255,255,0.3);
+}
+
+/* ───────────────────────── */
+/* Messages */
+/* ───────────────────────── */
+
+.errorMsg {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+.successMsg {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+/* ───────────────────────── */
+/* Responsive */
+/* ───────────────────────── */
+
+@media (max-width: 500px) {
+  .loginCard {
+    padding: 35px 25px;
+  }
+}

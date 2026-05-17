@@ -1,0 +1,211 @@
+.wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background: white;
+  padding: 40px 32px;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.maindiv { width: 90%; margin: auto; }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 24px;
+  background: white; border: 1px solid #dde3ed;
+  border-radius: 14px; padding: 6px; width: fit-content;
+}
+
+.tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: 10px;
+  font-size: 0.81rem; font-weight: 600;
+  color: #94a3b8; background: none;
+  border: 1px solid transparent;
+  cursor: pointer; transition: background 0.2s, color 0.2s; font-family: inherit;
+}
+.tab i { font-size: 0.72rem; }
+.tab:hover { background: #f1f5ff; color: #4f78c8; }
+.activeTab { background: #eef2fc !important; color: #4f78c8 !important; border-color: rgba(79,120,200,0.2) !important; }
+
+/* ── Top Bar ── */
+.topBar {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+}
+
+.title    { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0 0 4px; letter-spacing: -0.02em; }
+.subtitle { font-size: 0.8rem; color: #94a3b8; margin: 0; }
+
+.addBtn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #5282d4, #3a62b8);
+  color: white; border: none; border-radius: 12px;
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(79,120,200,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: box-shadow 0.2s; font-family: inherit;
+}
+.addBtn:hover { box-shadow: 0 8px 22px rgba(79,120,200,0.4), inset 0 1px 0 rgba(255,255,255,0.15); }
+
+/* ── Cards ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white; border-radius: 20px;
+  border: 1px solid #dde3ed; padding: 24px;
+  box-shadow: 0 4px 20px rgba(79,120,200,0.07), 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 12px 32px rgba(79,120,200,0.14), 0 2px 8px rgba(0,0,0,0.06); }
+
+.cardTop {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 16px;
+}
+
+.avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, #5282d4, #3a62b8);
+  color: white; font-size: 1.1rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(79,120,200,0.3);
+}
+.avatar2 { background: linear-gradient(135deg, #a78bfa, #7c3aed); box-shadow: 0 4px 10px rgba(124,58,237,0.3); }
+.avatar3 { background: linear-gradient(135deg, #34d399, #059669); box-shadow: 0 4px 10px rgba(5,150,105,0.3); }
+
+.statusBadge {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
+  background: #dcfce7; color: #166534; letter-spacing: 0.02em;
+}
+.pending   { background: #fef9c3; color: #854d0e; }
+.confirmed { background: #dcfce7; color: #166534; }
+
+.patientName { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 4px; }
+.patientType { font-size: 0.78rem; color: #94a3b8; margin: 0; }
+.divider     { height: 1px; background: #f1f5f9; margin: 16px 0; }
+
+.cardInfo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.infoItem { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #475569; }
+.infoItem i { color: #4f78c8; font-size: 0.75rem; width: 16px; }
+
+.cardActions { display: flex; gap: 6px; }
+
+.viewBtn {
+  flex: 1; padding: 8px;
+  background: linear-gradient(135deg, #5282d4, #3a62b8);
+  color: white; border: none; border-radius: 10px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 3px 10px rgba(79,120,200,0.25);
+  transition: box-shadow 0.2s; font-family: inherit;
+}
+.viewBtn:hover { box-shadow: 0 6px 16px rgba(79,120,200,0.35); }
+
+.rescheduleBtn {
+  flex: 1; padding: 8px; background: white;
+  color: #4f78c8; border: 1.5px solid #dde3ed;
+  border-radius: 10px; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; font-family: inherit;
+}
+.rescheduleBtn:hover { border-color: #4f78c8; background: #eef2fc; }
+
+.statusBtn {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1.5px solid #dde3ed; background: white;
+  font-size: 0.75rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s; font-family: inherit;
+}
+.confirmBtn:hover      { background: #dcfce7; border-color: #86efac; color: #166534; }
+.cancelStatusBtn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+/* ── Detail ── */
+.detailSection { padding: 4px 0; }
+
+.backBtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px; margin-bottom: 20px;
+  background: white; border: 1px solid #dde3ed;
+  border-radius: 10px; font-size: 0.81rem; font-weight: 600;
+  color: #64748b; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s; font-family: inherit;
+}
+.backBtn:hover { border-color: #4f78c8; color: #4f78c8; }
+
+.detailGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.detailCard {
+  background: white; border-radius: 16px;
+  border: 1px solid #dde3ed; padding: 22px 20px;
+  box-shadow: 0 4px 20px rgba(79,120,200,0.06);
+}
+
+.detailCardHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+
+.detailIcon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #eef2fc, #dce8f8);
+  border: 1px solid #c7d7f0; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; color: #4f78c8; flex-shrink: 0;
+}
+
+.detailCardTitle { font-size: 0.92rem; font-weight: 700; color: #1e293b; margin: 0; }
+.detailRows { display: flex; flex-direction: column; gap: 10px; }
+
+.detailRow {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #f1f5f9;
+}
+.detailRow:last-child { border-bottom: none; }
+
+.detailLabel { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
+.detailValue { font-size: 0.83rem; color: #1e293b; font-weight: 600; }
+
+/* ── Status Update Card ── */
+.statusDesc {
+  font-size: 0.8rem; color: #94a3b8; margin: 0 0 14px;
+}
+
+.statusBtnsGroup { display: flex; flex-direction: column; gap: 8px; }
+
+.statusGroupBtn {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px; border-radius: 12px;
+  background: white; border: 1px solid #dde3ed;
+  cursor: pointer; width: 100%;
+  transition: border-color 0.2s, background 0.2s; font-family: inherit;
+}
+
+.statusBtnLeft { display: flex; align-items: center; gap: 12px; }
+
+.statusBtnIcon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; flex-shrink: 0;
+}
+
+.statusBtnTitle { font-size: 0.83rem; font-weight: 600; color: #1e293b; margin: 0 0 2px; text-align: left; }
+.statusBtnSub   { font-size: 0.7rem; color: #94a3b8; margin: 0; text-align: left; }
+
+.statusConfirm:hover { border-color: #86efac; background: #f0fdf4; }
+.statusPending:hover { border-color: #fde047; background: #fefce8; }
+.statusCancel:hover  { border-color: #fca5a5; background: #fff5f5; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .wrapper    { padding: 20px 16px; }
+  .maindiv    { width: 100%; }
+  .title      { font-size: 1.2rem; }
+  .cards      { grid-template-columns: 1fr; }
+  .detailGrid { grid-template-columns: 1fr; }
+  .tabs       { width: 100%; }
+}
