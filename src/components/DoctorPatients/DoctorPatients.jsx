@@ -22,7 +22,6 @@ function resolveUrl(path) {
 
 function formatDate(iso) {
   if (!iso) return 'N/A'
-
   return new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -50,6 +49,17 @@ export default function DoctorPatients() {
     fetchPatients()
   }, [token])
 
+  // ✅ Listen for new case creation and re-fetch patients
+  useEffect(() => {
+    function handleCaseCreated() {
+      fetchPatients()
+    }
+    window.addEventListener('caseCreated', handleCaseCreated)
+    return () => {
+      window.removeEventListener('caseCreated', handleCaseCreated)
+    }
+  }, [])
+
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm])
@@ -70,9 +80,7 @@ export default function DoctorPatients() {
       })
 
       const data = res.data?.data ?? res.data
-      const items = Array.isArray(data)
-        ? data
-        : data?.items ?? []
+      const items = Array.isArray(data) ? data : data?.items ?? []
 
       setPatients(items)
 
@@ -311,19 +319,13 @@ export default function DoctorPatients() {
 
                 <button
                   className={Style.pageArrow}
-                  onClick={() =>
-                    setCurrentPage(p => Math.max(1, p - 1))
-                  }
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
                   <i className="fa-solid fa-chevron-left"></i>
                 </button>
 
-                {Array.from(
-                  { length: totalPages },
-                  (_, i) => i + 1
-                ).map(page => (
-
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                   <button
                     key={page}
                     className={`${Style.pageBtn} ${currentPage === page ? Style.pageBtnActive : ''}`}
@@ -331,14 +333,11 @@ export default function DoctorPatients() {
                   >
                     {page}
                   </button>
-
                 ))}
 
                 <button
                   className={Style.pageArrow}
-                  onClick={() =>
-                    setCurrentPage(p => Math.min(totalPages, p + 1))
-                  }
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
                   <i className="fa-solid fa-chevron-right"></i>
@@ -366,19 +365,13 @@ export default function DoctorPatients() {
               <div className={Style.modalHeader}>
 
                 <div className={Style.modalAvatar}>
-                  {getInitial(
-                    selectedPatient.fullName ||
-                    selectedPatient.name
-                  )}
+                  {getInitial(selectedPatient.fullName || selectedPatient.name)}
                 </div>
 
                 <div>
                   <h2>
-                    {selectedPatient.fullName ||
-                      selectedPatient.name ||
-                      'Unknown'}
+                    {selectedPatient.fullName || selectedPatient.name || 'Unknown'}
                   </h2>
-
                   <p>Patient Details</p>
                 </div>
 
@@ -395,12 +388,10 @@ export default function DoctorPatients() {
               ) : scans.length > 0 ? (
 
                 (() => {
-
                   const scan = scans[0]
                   const url = resolveUrl(scan.imageUrl)
 
                   return (
-
                     <div
                       className={Style.modalCtWrap}
                       onClick={() => url && setCtModalImage(url)}
@@ -435,7 +426,6 @@ export default function DoctorPatients() {
                         {scan.scanDate && (
                           <span className={Style.ctScanDate}>
                             <i className="fa-solid fa-calendar-days"></i>
-
                             {formatDate(scan.scanDate)}
                           </span>
                         )}
@@ -443,9 +433,7 @@ export default function DoctorPatients() {
                       </div>
 
                     </div>
-
                   )
-
                 })()
 
               ) : (
@@ -461,58 +449,26 @@ export default function DoctorPatients() {
               <div className={Style.modalBody}>
 
                 {[
-                  {
-                    label: 'Email',
-                    icon: 'fa-envelope',
-                    value: selectedPatient.email
-                  },
-                  {
-                    label: 'Phone',
-                    icon: 'fa-phone',
-                    value: selectedPatient.phoneNumber ||
-                      selectedPatient.phone
-                  },
-                  {
-                    label: 'Gender',
-                    icon: 'fa-venus-mars',
-                    value: selectedPatient.gender
-                  },
-                  {
-                    label: 'Date of Birth',
-                    icon: 'fa-cake-candles',
-                    value: formatDate(selectedPatient.dateOfBirth)
-                  },
-                  {
-                    label: 'Blood Type',
-                    icon: 'fa-droplet',
-                    value: selectedPatient.bloodType
-                  },
+                  { label: 'Email',       icon: 'fa-envelope',    value: selectedPatient.email },
+                  { label: 'Phone',       icon: 'fa-phone',       value: selectedPatient.phoneNumber || selectedPatient.phone },
+                  { label: 'Gender',      icon: 'fa-venus-mars',  value: selectedPatient.gender },
+                  { label: 'Date of Birth', icon: 'fa-cake-candles', value: formatDate(selectedPatient.dateOfBirth) },
+                  { label: 'Blood Type',  icon: 'fa-droplet',     value: selectedPatient.bloodType },
                 ].map(({ label, icon, value }) => (
-
                   value ? (
-                    <div
-                      className={Style.detailItem}
-                      key={label}
-                    >
-
+                    <div className={Style.detailItem} key={label}>
                       <span>
                         <i className={`fa-solid ${icon}`}></i>
                         {label}
                       </span>
-
                       <strong>{value}</strong>
-
                     </div>
                   ) : null
-
                 ))}
 
               </div>
 
-              <button
-                className={Style.closeBtn}
-                onClick={handleCloseModal}
-              >
+              <button className={Style.closeBtn} onClick={handleCloseModal}>
                 Close
               </button>
 
@@ -534,26 +490,20 @@ export default function DoctorPatients() {
             >
 
               <div className={Style.ctViewerHeader}>
-
                 <span>
                   <i className="fa-solid fa-x-ray"></i>
                   CT Scan
                 </span>
-
                 <button
                   className={Style.ctCloseBtn}
                   onClick={() => setCtModalImage(null)}
                 >
                   <i className="fa-solid fa-xmark"></i>
                 </button>
-
               </div>
 
               <div className={Style.ctViewerBody}>
-                <img
-                  src={ctModalImage}
-                  alt="CT Scan Full View"
-                />
+                <img src={ctModalImage} alt="CT Scan Full View" />
               </div>
 
             </div>
