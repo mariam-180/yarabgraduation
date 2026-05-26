@@ -32,19 +32,35 @@ export default function DoctorProfile() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
 
-  const { token } = useAuth();
+  const { token, updateUser, refreshAccessToken } = useAuth();
+
+  // ── Helper: makes a request, retries once with a new token on 401 ──
+  async function authRequest(requestFn) {
+    try {
+      return await requestFn(token);
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          return await requestFn(newToken); // retry with new token
+        }
+      }
+      throw err; // re-throw if not 401 or refresh failed
+    }
+  }
 
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const response = await axios.get(`${BASE_URL}/profile`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await authRequest((t) =>
+          axios.get(`${BASE_URL}/profile`, {
+            headers: { Authorization: `Bearer ${t}` },
+          })
+        );
 
         const data = response.data.data || response.data;
 
         setDoctor(data);
-
         setForm({
           fullName: data?.fullName || data?.name || '',
           specialty: data?.specialty || data?.specialization || '',
@@ -64,10 +80,7 @@ export default function DoctorProfile() {
   }, [token]);
 
   const handleChange = (e) => {
-    setForm(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setSaveError('');
     setSaveSuccess(false);
   };
@@ -78,18 +91,18 @@ export default function DoctorProfile() {
     setSaveSuccess(false);
 
     try {
-      await axios.put(
-        `${BASE_URL}/profile`,
-        {
-          fullName: form.fullName,
-          specialty: form.specialty,
-          email: form.email,
-          phone: form.phone,
-          bio: form.bio,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      await authRequest((t) =>
+        axios.put(
+          `${BASE_URL}/profile`,
+          {
+            fullName: form.fullName,
+            specialty: form.specialty,
+            email: form.email,
+            phone: form.phone,
+            bio: form.bio,
+          },
+          { headers: { Authorization: `Bearer ${t}` } }
+        )
       );
 
       setDoctor(prev => ({
@@ -106,8 +119,9 @@ export default function DoctorProfile() {
         description: form.bio,
       }));
 
-      setSaveSuccess(true);
+      updateUser({ fullName: form.fullName });
 
+      setSaveSuccess(true);
       setTimeout(() => {
         setSaveSuccess(false);
         setActiveTab('profile');
@@ -125,10 +139,7 @@ export default function DoctorProfile() {
   };
 
   const handlePasswordInput = (e) => {
-    setPasswordForm(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setPasswordForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setPasswordError('');
     setPasswordSuccess(false);
   };
@@ -137,11 +148,7 @@ export default function DoctorProfile() {
     setPasswordError('');
     setPasswordSuccess(false);
 
-    if (
-      !passwordForm.currentPassword ||
-      !passwordForm.newPassword ||
-      !passwordForm.confirmPassword
-    ) {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
       setPasswordError('Please fill all password fields.');
       return;
     }
@@ -162,32 +169,26 @@ export default function DoctorProfile() {
     try {
       setPasswordSaving(true);
 
-      // ✅ Fixed: changed from axios.put to axios.post
-      const response = await axios.post(
-        'https://lungcancer.runasp.net/api/Auth/change-password',
-        {
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword,
-          confirmNewPassword: passwordForm.confirmPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
+      await authRequest((t) =>
+        axios.post(
+          'https://lungcancer.runasp.net/api/Auth/change-password',
+          {
+            currentPassword: passwordForm.currentPassword,
+            newPassword: passwordForm.newPassword,
+            confirmNewPassword: passwordForm.confirmPassword,
           },
-        }
+          {
+            headers: {
+              Authorization: `Bearer ${t}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          }
+        )
       );
 
-      console.log('PASSWORD CHANGED:', response.data);
-
       setPasswordSuccess(true);
-
-      setPasswordForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
       setTimeout(() => {
         setPasswordSuccess(false);
@@ -195,8 +196,6 @@ export default function DoctorProfile() {
       }, 1500);
 
     } catch (err) {
-      console.log('FULL ERROR:', err.response?.status, err.response?.data);
-
       if (err.response?.data?.errors) {
         const errors = Object.values(err.response.data.errors).flat().join(' ');
         setPasswordError(errors);
@@ -207,7 +206,6 @@ export default function DoctorProfile() {
           'Failed to change password. Please check your current password and try again.'
         );
       }
-
     } finally {
       setPasswordSaving(false);
     }
@@ -234,14 +232,9 @@ export default function DoctorProfile() {
 
         {/* ── Left: Profile Card ── */}
         <div className={Style.leftCol}>
-
           <div className={Style.avatarWrap}>
             <img
-              src={
-                doctor?.profileImage ||
-                doctor?.image ||
-                "https://randomuser.me/api/portraits/men/32.jpg"
-              }
+              src={doctor?.profileImage || doctor?.image || "https://randomuser.me/api/portraits/men/32.jpg"}
               alt="Doctor"
               className={Style.avatar}
             />
@@ -267,16 +260,12 @@ export default function DoctorProfile() {
               <strong>{doctor?.yearsOfExperience ?? doctor?.experience ?? '—'}</strong>
               <span>Years Exp.</span>
             </div>
-
             <div className={Style.statDivider}></div>
-
             <div className={Style.stat}>
               <strong>{doctor?.rating ?? '—'}</strong>
               <span>Rating</span>
             </div>
-
             <div className={Style.statDivider}></div>
-
             <div className={Style.stat}>
               <strong>{doctor?.patientsCount ?? doctor?.patients ?? '—'}</strong>
               <span>Patients</span>
@@ -301,7 +290,6 @@ export default function DoctorProfile() {
               <i className="fa-solid fa-user-doctor"></i>
               Profile
             </button>
-
             <button
               className={`${Style.tab} ${activeTab === 'edit' ? Style.activeTab : ''}`}
               onClick={() => setActiveTab('edit')}
@@ -309,7 +297,6 @@ export default function DoctorProfile() {
               <i className="fa-solid fa-pen"></i>
               Edit Profile
             </button>
-
             <button
               className={`${Style.tab} ${activeTab === 'password' ? Style.activeTab : ''}`}
               onClick={() => setActiveTab('password')}
@@ -324,12 +311,9 @@ export default function DoctorProfile() {
             <>
               <div className={Style.section}>
                 <div className={Style.sectionHeader}>
-                  <div className={Style.sectionIcon}>
-                    <i className="fa-solid fa-id-card"></i>
-                  </div>
+                  <div className={Style.sectionIcon}><i className="fa-solid fa-id-card"></i></div>
                   <h3 className={Style.sectionTitle}>Short Bio</h3>
                 </div>
-
                 <p className={Style.bioText}>
                   {doctor?.bio || doctor?.about || doctor?.description || 'No bio available.'}
                 </p>
@@ -337,42 +321,31 @@ export default function DoctorProfile() {
 
               <div className={Style.section}>
                 <div className={Style.sectionHeader}>
-                  <div className={Style.sectionIcon}>
-                    <i className="fa-solid fa-list-check"></i>
-                  </div>
+                  <div className={Style.sectionIcon}><i className="fa-solid fa-list-check"></i></div>
                   <h3 className={Style.sectionTitle}>Services & Price List</h3>
                 </div>
-
                 <div className={Style.servicesList}>
                   <div className={Style.serviceRow}>
                     <div className={Style.serviceLeft}>
-                      <div className={Style.serviceIcon}>
-                        <i className="fa-solid fa-x-ray"></i>
-                      </div>
+                      <div className={Style.serviceIcon}><i className="fa-solid fa-x-ray"></i></div>
                       <div>
                         <p className={Style.serviceName}>Order Imaging Tests</p>
                         <p className={Style.serviceSub}>X-Ray · CT · MRI</p>
                       </div>
                     </div>
                   </div>
-
                   <div className={Style.serviceRow}>
                     <div className={Style.serviceLeft}>
-                      <div className={Style.serviceIcon}>
-                        <i className="fa-solid fa-calendar-check"></i>
-                      </div>
+                      <div className={Style.serviceIcon}><i className="fa-solid fa-calendar-check"></i></div>
                       <div>
                         <p className={Style.serviceName}>Recommend Follow-Ups</p>
                         <p className={Style.serviceSub}>Post-diagnosis planning</p>
                       </div>
                     </div>
                   </div>
-
                   <div className={Style.serviceRow}>
                     <div className={Style.serviceLeft}>
-                      <div className={Style.serviceIcon}>
-                        <i className="fa-solid fa-file-medical"></i>
-                      </div>
+                      <div className={Style.serviceIcon}><i className="fa-solid fa-file-medical"></i></div>
                       <div>
                         <p className={Style.serviceName}>Report & Consult</p>
                         <p className={Style.serviceSub}>Detailed written report</p>
@@ -388,127 +361,50 @@ export default function DoctorProfile() {
           {activeTab === 'edit' && (
             <div className={Style.section}>
               <div className={Style.sectionHeader}>
-                <div className={Style.sectionIcon}>
-                  <i className="fa-solid fa-pen"></i>
-                </div>
+                <div className={Style.sectionIcon}><i className="fa-solid fa-pen"></i></div>
                 <h3 className={Style.sectionTitle}>Update Profile</h3>
               </div>
 
               <div className={Style.formGrid}>
                 <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-user"></i>
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-user"></i> Full Name</label>
+                  <input type="text" name="fullName" value={form.fullName} onChange={handleChange} className={Style.formInput} />
                 </div>
-
                 <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-stethoscope"></i>
-                    Specialty
-                  </label>
-                  <input
-                    type="text"
-                    name="specialty"
-                    value={form.specialty}
-                    onChange={handleChange}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-stethoscope"></i> Specialty</label>
+                  <input type="text" name="specialty" value={form.specialty} onChange={handleChange} className={Style.formInput} />
                 </div>
-
                 <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-envelope"></i>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-envelope"></i> Email</label>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} className={Style.formInput} />
                 </div>
-
                 <div className={Style.formGroup}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-phone"></i>
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="+1 234 567 8900"
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-phone"></i> Phone</label>
+                  <input type="text" name="phone" value={form.phone} onChange={handleChange} placeholder="+1 234 567 8900" className={Style.formInput} />
                 </div>
-
                 <div className={`${Style.formGroup} ${Style.fullWidth}`}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-id-card"></i>
-                    Bio
-                  </label>
-                  <textarea
-                    name="bio"
-                    value={form.bio}
-                    onChange={handleChange}
-                    className={`${Style.formInput} ${Style.formTextarea}`}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-id-card"></i> Bio</label>
+                  <textarea name="bio" value={form.bio} onChange={handleChange} className={`${Style.formInput} ${Style.formTextarea}`} />
                 </div>
               </div>
 
               {saveError && (
                 <p style={{ color: '#e05252', fontSize: '0.82rem', marginBottom: 12 }}>
-                  <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }}></i>
-                  {saveError}
+                  <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }}></i>{saveError}
                 </p>
               )}
-
               {saveSuccess && (
                 <p style={{ color: '#22c55e', fontSize: '0.82rem', marginBottom: 12 }}>
-                  <i className="fa-solid fa-check-circle" style={{ marginRight: 6 }}></i>
-                  Profile updated successfully!
+                  <i className="fa-solid fa-check-circle" style={{ marginRight: 6 }}></i>Profile updated successfully!
                 </p>
               )}
 
               <div className={Style.formActions}>
-                <button
-                  className={Style.cancelBtn}
-                  onClick={() => {
-                    setActiveTab('profile');
-                    setSaveError('');
-                    setSaveSuccess(false);
-                  }}
-                  disabled={saving}
-                >
+                <button className={Style.cancelBtn} onClick={() => { setActiveTab('profile'); setSaveError(''); setSaveSuccess(false); }} disabled={saving}>
                   Cancel
                 </button>
-
-                <button
-                  className={Style.submitBtn}
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin"></i>
-                      Saving…
-                    </>
-                  ) : (
-                    <>
-                      <i className="fa-solid fa-check"></i>
-                      Save Changes
-                    </>
-                  )}
+                <button className={Style.submitBtn} onClick={handleSave} disabled={saving}>
+                  {saving ? <><i className="fa-solid fa-spinner fa-spin"></i> Saving…</> : <><i className="fa-solid fa-check"></i> Save Changes</>}
                 </button>
               </div>
             </div>
@@ -518,53 +414,22 @@ export default function DoctorProfile() {
           {activeTab === 'password' && (
             <div className={Style.section}>
               <div className={Style.sectionHeader}>
-                <div className={Style.sectionIcon}>
-                  <i className="fa-solid fa-lock"></i>
-                </div>
+                <div className={Style.sectionIcon}><i className="fa-solid fa-lock"></i></div>
                 <h3 className={Style.sectionTitle}>Change Password</h3>
               </div>
 
               <div className={Style.formGrid}>
                 <div className={`${Style.formGroup} ${Style.fullWidth}`}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-key"></i>
-                    Current Password
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordInput}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-key"></i> Current Password</label>
+                  <input type="password" name="currentPassword" value={passwordForm.currentPassword} onChange={handlePasswordInput} className={Style.formInput} />
                 </div>
-
                 <div className={`${Style.formGroup} ${Style.fullWidth}`}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-lock"></i>
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordForm.newPassword}
-                    onChange={handlePasswordInput}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-lock"></i> New Password</label>
+                  <input type="password" name="newPassword" value={passwordForm.newPassword} onChange={handlePasswordInput} className={Style.formInput} />
                 </div>
-
                 <div className={`${Style.formGroup} ${Style.fullWidth}`}>
-                  <label className={Style.formLabel}>
-                    <i className="fa-solid fa-check"></i>
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordForm.confirmPassword}
-                    onChange={handlePasswordInput}
-                    className={Style.formInput}
-                  />
+                  <label className={Style.formLabel}><i className="fa-solid fa-check"></i> Confirm Password</label>
+                  <input type="password" name="confirmPassword" value={passwordForm.confirmPassword} onChange={handlePasswordInput} className={Style.formInput} />
                 </div>
               </div>
 
@@ -575,47 +440,21 @@ export default function DoctorProfile() {
 
               {passwordError && (
                 <p style={{ color: '#e05252', fontSize: '0.82rem', marginBottom: 12 }}>
-                  <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }}></i>
-                  {passwordError}
+                  <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }}></i>{passwordError}
                 </p>
               )}
-
               {passwordSuccess && (
                 <p style={{ color: '#22c55e', fontSize: '0.82rem', marginBottom: 12 }}>
-                  <i className="fa-solid fa-check-circle" style={{ marginRight: 6 }}></i>
-                  Password changed successfully!
+                  <i className="fa-solid fa-check-circle" style={{ marginRight: 6 }}></i>Password changed successfully!
                 </p>
               )}
 
               <div className={Style.formActions}>
-                <button
-                  className={Style.cancelBtn}
-                  onClick={() => {
-                    setActiveTab('profile');
-                    setPasswordError('');
-                    setPasswordSuccess(false);
-                  }}
-                  disabled={passwordSaving}
-                >
+                <button className={Style.cancelBtn} onClick={() => { setActiveTab('profile'); setPasswordError(''); setPasswordSuccess(false); }} disabled={passwordSaving}>
                   Cancel
                 </button>
-
-                <button
-                  className={Style.submitBtn}
-                  onClick={handleChangePassword}
-                  disabled={passwordSaving}
-                >
-                  {passwordSaving ? (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin"></i>
-                      Updating...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fa-solid fa-lock"></i>
-                      Change Password
-                    </>
-                  )}
+                <button className={Style.submitBtn} onClick={handleChangePassword} disabled={passwordSaving}>
+                  {passwordSaving ? <><i className="fa-solid fa-spinner fa-spin"></i> Updating...</> : <><i className="fa-solid fa-lock"></i> Change Password</>}
                 </button>
               </div>
             </div>
